@@ -9,6 +9,18 @@ import UIKit
 
 class DetailVC: UIViewController {
     
+    lazy var scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        return scrollView
+    }()
+    
+    lazy var contentView: UIView = {
+        let contentView = UIView()
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        return contentView
+    }()
+    
     lazy var bannerImg: UIImageView = {
         let v = UIImageView()
         v.backgroundColor = #colorLiteral(red: 0.768627451, green: 0.768627451, blue: 0.768627451, alpha: 1)
@@ -90,6 +102,25 @@ class DetailVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+        
         hdView.addSubview(hdLabel)
         NSLayoutConstraint.activate([
             hdLabel.leadingAnchor.constraint(equalTo: hdView.leadingAnchor, constant: 4),
@@ -104,13 +135,12 @@ class DetailVC: UIViewController {
         hdStack.alignment = .center
         hdStack.translatesAutoresizingMaskIntoConstraints = false
         
-        view.backgroundColor = .white
-        view.addSubview(bannerImg)
-        view.addSubview(backBtn)
+        contentView.addSubview(bannerImg)
+        contentView.addSubview(backBtn)
         NSLayoutConstraint.activate([
-            bannerImg.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            bannerImg.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            bannerImg.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bannerImg.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            bannerImg.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
+            bannerImg.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             bannerImg.heightAnchor.constraint(equalTo: bannerImg.widthAnchor),
             
             backBtn.heightAnchor.constraint(equalToConstant: 24),
@@ -124,25 +154,25 @@ class DetailVC: UIViewController {
         labelStack.alignment = .leading
         labelStack.spacing = 4
         labelStack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(labelStack)
+        contentView.addSubview(labelStack)
         NSLayoutConstraint.activate([
             labelStack.leadingAnchor.constraint(equalTo: bannerImg.leadingAnchor, constant: 16),
             labelStack.bottomAnchor.constraint(equalTo: bannerImg.bottomAnchor, constant: -16),
             labelStack.trailingAnchor.constraint(greaterThanOrEqualTo: bannerImg.trailingAnchor),
         ])
         
-        view.addSubview(descLabel)
+        contentView.addSubview(descLabel)
         NSLayoutConstraint.activate([
-            descLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            descLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             descLabel.topAnchor.constraint(equalTo: bannerImg.bottomAnchor, constant: 24),
-            descLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            descLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
         ])
         
-        view.addSubview(castLabel)
+        contentView.addSubview(castLabel)
         NSLayoutConstraint.activate([
-            castLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            castLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             castLabel.topAnchor.constraint(equalTo: descLabel.bottomAnchor, constant: 24),
-            castLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            castLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
         ])
     }
 }
