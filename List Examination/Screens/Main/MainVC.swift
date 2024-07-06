@@ -25,11 +25,13 @@ class MainVC: UIViewController {
     // MARK: - UI Elements
     let tableView = UITableView()
     let refreshControl = UIRefreshControl()
-    let searchController = UISearchController(searchResultsController: nil)
+    let searchView = UIView()
+    let searchTf = UITextField()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.backgroundColor = .white
         setupTableView()
         setupRefreshControl()
         setUpSearchController()
@@ -37,13 +39,31 @@ class MainVC: UIViewController {
         loadNextPage()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.setNavigationBarHidden(true, animated: animated)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
     private func setupTableView() {
-        tableView.frame = view.bounds
+        tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
         tableView.delegate = self
         view.addSubview(tableView)
         tableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.identifier)
         tableView.separatorStyle = .none
+        
+        NSLayoutConstraint.activate([
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     // MARK: - Pagination
@@ -90,11 +110,63 @@ class MainVC: UIViewController {
     
     // MARK: - Searchable
     private func setUpSearchController() {
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = true
-        searchController.searchBar.placeholder = "Search"
-        navigationItem.searchController = searchController
-        definesPresentationContext = true
+        // TODO: Make it a class instead of manual in case of reuse.
+        searchView.backgroundColor = #colorLiteral(red: 0.9467977881, green: 0.9467977881, blue: 0.9467977881, alpha: 1)
+        searchView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(searchView)
+        NSLayoutConstraint.activate([
+            searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchView.topAnchor.constraint(equalTo: view.topAnchor),
+            searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            searchView.bottomAnchor.constraint(equalTo: tableView.topAnchor, constant: -20),
+        ])
+        
+        searchView.addSubview(searchTf)
+        searchTf.translatesAutoresizingMaskIntoConstraints = false
+        searchTf.delegate = self
+        searchTf.placeholder = "Search"
+        searchTf.font = UIFont(name: "Poppins-Regular", size: 12.0)
+        NSLayoutConstraint.activate([
+            searchTf.leadingAnchor.constraint(equalTo: searchView.leadingAnchor, constant: 16),
+            searchTf.topAnchor.constraint(equalTo: searchView.safeAreaLayoutGuide.topAnchor, constant: 18),
+        ])
+        
+        let searchImg = UIImage(systemName: "magnifyingglass")
+        let searchImgView = UIImageView(image: searchImg)
+        searchImgView.tintColor = .black
+        searchImgView.translatesAutoresizingMaskIntoConstraints = false
+        searchView.addSubview(searchImgView)
+        NSLayoutConstraint.activate([
+            searchImgView.leadingAnchor.constraint(equalTo: searchTf.trailingAnchor, constant: 8),
+            searchImgView.trailingAnchor.constraint(equalTo: searchView.trailingAnchor, constant: -20),
+            searchImgView.centerYAnchor.constraint(equalTo: searchTf.centerYAnchor),
+        ])
+        
+        let bottomBorder = UIView()
+        bottomBorder.translatesAutoresizingMaskIntoConstraints = false
+        searchView.addSubview(bottomBorder)
+        bottomBorder.backgroundColor = #colorLiteral(red: 0.5406724811, green: 0.5406724811, blue: 0.5406724811, alpha: 1)
+        NSLayoutConstraint.activate([
+            bottomBorder.leadingAnchor.constraint(equalTo: searchView.leadingAnchor, constant: 16),
+            bottomBorder.trailingAnchor.constraint(equalTo: searchView.trailingAnchor, constant: -15),
+            bottomBorder.topAnchor.constraint(equalTo: searchTf.bottomAnchor, constant: 9),
+            bottomBorder.bottomAnchor.constraint(equalTo: searchView.bottomAnchor, constant: -11),
+            bottomBorder.heightAnchor.constraint(equalToConstant: 1)
+        ])
+    }
+    
+    @objc private func searchButtonTapped() {
+        searchTf.endEditing(true)
+        filterContentForSearchText(searchTf.text ?? "")
+    }
+    
+    func filterContentForSearchText(_ searchText: String) {
+        if searchText.isEmpty {
+            displayedData = allData
+        } else {
+            displayedData = allData.filter { $0.lowercased().contains(searchText.lowercased()) }
+        }
+        tableView.reloadData()
     }
     
 }
@@ -131,17 +203,17 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-extension MainVC: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        filterContentForSearchText(searchController.searchBar.text ?? "")
+extension MainVC: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        guard let stringRange = Range(range, in: currentText) else { return false }
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        filterContentForSearchText(updatedText)
+        return true
     }
-    
-    func filterContentForSearchText(_ searchText: String) {
-        if searchText.isEmpty {
-            displayedData = allData
-        } else {
-            displayedData = allData.filter { $0.lowercased().contains(searchText.lowercased()) }
-        }
-        tableView.reloadData()
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        searchButtonTapped()
+        return true
     }
 }

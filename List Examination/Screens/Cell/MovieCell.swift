@@ -39,7 +39,7 @@ class MovieCell: UITableViewCell {
     let genreLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont(name: "Poppins-Regular", size: 12)
+        label.font = UIFont(name: "Poppins-Regular", size: 12.0)
         label.textColor = #colorLiteral(red: 0.4666666667, green: 0.4666666667, blue: 0.4666666667, alpha: 1)
         return label
     }()
