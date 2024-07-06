@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		ED027FD62C390DFE007AE287 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED027FD52C390DFE007AE287 /* MainVC.swift */; };
 		ED027FD82C390E0C007AE287 /* DetailVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED027FD72C390E0C007AE287 /* DetailVC.swift */; };
+		ED027FDA2C391E4C007AE287 /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED027FD92C391E4C007AE287 /* MovieCell.swift */; };
+		ED027FDE2C391EF7007AE287 /* UITableViewCell+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED027FDD2C391EF7007AE287 /* UITableViewCell+Extensions.swift */; };
 		ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E52C38648A00A7705F /* AppDelegate.swift */; };
 		ED7269E82C38648A00A7705F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E72C38648A00A7705F /* SceneDelegate.swift */; };
 		ED7269EF2C38648C00A7705F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED7269EE2C38648C00A7705F /* Assets.xcassets */; };
@@ -38,6 +40,26 @@
 /* Begin PBXFileReference section */
 		ED027FD52C390DFE007AE287 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		ED027FD72C390E0C007AE287 /* DetailVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailVC.swift; sourceTree = "<group>"; };
+		ED027FD92C391E4C007AE287 /* MovieCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
+		ED027FDD2C391EF7007AE287 /* UITableViewCell+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+Extensions.swift"; sourceTree = "<group>"; };
+		ED027FE02C39279C007AE287 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
+		ED027FE12C39279C007AE287 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Regular.ttf"; sourceTree = "<group>"; };
+		ED027FE22C39279C007AE287 /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
+		ED027FE32C39279C007AE287 /* Poppins-Black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Black.ttf"; sourceTree = "<group>"; };
+		ED027FE42C39279C007AE287 /* Poppins-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Light.ttf"; sourceTree = "<group>"; };
+		ED027FE52C39279C007AE287 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Medium.ttf"; sourceTree = "<group>"; };
+		ED027FE62C39279C007AE287 /* Poppins-SemiBoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
+		ED027FE72C39279C007AE287 /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
+		ED027FE82C39279C007AE287 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
+		ED027FE92C39279C007AE287 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Thin.ttf"; sourceTree = "<group>"; };
+		ED027FEA2C39279C007AE287 /* Poppins-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Italic.ttf"; sourceTree = "<group>"; };
+		ED027FEB2C39279C007AE287 /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
+		ED027FEC2C39279C007AE287 /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
+		ED027FED2C39279C007AE287 /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
+		ED027FEE2C39279C007AE287 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
+		ED027FEF2C39279C007AE287 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		ED027FF02C39279C007AE287 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
+		ED027FF12C39279C007AE287 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		ED7269E22C38648A00A7705F /* List Examination.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "List Examination.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED7269E52C38648A00A7705F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ED7269E72C38648A00A7705F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -79,6 +101,7 @@
 		ED027FD22C390DC6007AE287 /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				ED027FDB2C391E55007AE287 /* Cell */,
 				ED027FD42C390DDF007AE287 /* Detail */,
 				ED027FD32C390DD3007AE287 /* Main */,
 			);
@@ -99,6 +122,47 @@
 				ED027FD72C390E0C007AE287 /* DetailVC.swift */,
 			);
 			path = Detail;
+			sourceTree = "<group>";
+		};
+		ED027FDB2C391E55007AE287 /* Cell */ = {
+			isa = PBXGroup;
+			children = (
+				ED027FD92C391E4C007AE287 /* MovieCell.swift */,
+			);
+			path = Cell;
+			sourceTree = "<group>";
+		};
+		ED027FDC2C391EDE007AE287 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				ED027FDD2C391EF7007AE287 /* UITableViewCell+Extensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		ED027FDF2C392736007AE287 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				ED027FE32C39279C007AE287 /* Poppins-Black.ttf */,
+				ED027FE72C39279C007AE287 /* Poppins-BlackItalic.ttf */,
+				ED027FEF2C39279C007AE287 /* Poppins-Bold.ttf */,
+				ED027FEB2C39279C007AE287 /* Poppins-BoldItalic.ttf */,
+				ED027FE82C39279C007AE287 /* Poppins-ExtraBold.ttf */,
+				ED027FE02C39279C007AE287 /* Poppins-ExtraBoldItalic.ttf */,
+				ED027FF12C39279C007AE287 /* Poppins-ExtraLight.ttf */,
+				ED027FEC2C39279C007AE287 /* Poppins-ExtraLightItalic.ttf */,
+				ED027FEA2C39279C007AE287 /* Poppins-Italic.ttf */,
+				ED027FE42C39279C007AE287 /* Poppins-Light.ttf */,
+				ED027FED2C39279C007AE287 /* Poppins-LightItalic.ttf */,
+				ED027FE52C39279C007AE287 /* Poppins-Medium.ttf */,
+				ED027FEE2C39279C007AE287 /* Poppins-MediumItalic.ttf */,
+				ED027FE12C39279C007AE287 /* Poppins-Regular.ttf */,
+				ED027FF02C39279C007AE287 /* Poppins-SemiBold.ttf */,
+				ED027FE62C39279C007AE287 /* Poppins-SemiBoldItalic.ttf */,
+				ED027FE92C39279C007AE287 /* Poppins-Thin.ttf */,
+				ED027FE22C39279C007AE287 /* Poppins-ThinItalic.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		ED7269D92C38648A00A7705F = {
@@ -124,6 +188,8 @@
 		ED7269E42C38648A00A7705F /* List Examination */ = {
 			isa = PBXGroup;
 			children = (
+				ED027FDF2C392736007AE287 /* Fonts */,
+				ED027FDC2C391EDE007AE287 /* Extensions */,
 				ED027FD22C390DC6007AE287 /* Screens */,
 				ED7269E52C38648A00A7705F /* AppDelegate.swift */,
 				ED7269E72C38648A00A7705F /* SceneDelegate.swift */,
@@ -283,7 +349,9 @@
 			files = (
 				ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */,
 				ED027FD82C390E0C007AE287 /* DetailVC.swift in Sources */,
+				ED027FDE2C391EF7007AE287 /* UITableViewCell+Extensions.swift in Sources */,
 				ED027FD62C390DFE007AE287 /* MainVC.swift in Sources */,
+				ED027FDA2C391E4C007AE287 /* MovieCell.swift in Sources */,
 				ED7269E82C38648A00A7705F /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -22,7 +22,7 @@ class MainVC: UIViewController {
     let totalPage = 3
     var currentPage = MainVC.firstPage
     
-    // MARK: - Views
+    // MARK: - UI Elements
     let tableView = UITableView()
     let refreshControl = UIRefreshControl()
     let searchController = UISearchController(searchResultsController: nil)
@@ -42,7 +42,11 @@ class MainVC: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         view.addSubview(tableView)
+        tableView.register(MovieCell.self, forCellReuseIdentifier: MovieCell.identifier)
+        tableView.separatorStyle = .none
     }
+    
+    // MARK: - Pagination
     
     func loadNextPage() {
         DispatchQueue.global().async {
@@ -101,9 +105,13 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: MovieCell.identifier) as! MovieCell
         
-        cell.textLabel?.text = displayedData[indexPath.row]
+        let movieTitle = displayedData[indexPath.row]
+        let movieYear = "2022"
+        let movieGenre = "Drama, Asia, Comedy, Series"
+        
+        cell.configure(with: movieTitle, year: movieYear, genre: movieGenre)
         
         // Load next page on last cell
         if indexPath.row == displayedData.count - 1 {
