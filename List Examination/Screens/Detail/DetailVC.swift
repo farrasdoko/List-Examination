@@ -9,6 +9,11 @@ import UIKit
 
 class DetailVC: UIViewController {
     
+    // MARK: - Data variables
+    let casts = ["Dave Franco", "Alexa Kee", "Fernando Abigail", "Dave Franco"]
+    
+    // MARK: UI Elements
+    
     let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -102,9 +107,10 @@ class DetailVC: UIViewController {
     let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
+        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .white
+        collectionView.backgroundColor = .clear
         return collectionView
     }()
 
@@ -183,5 +189,37 @@ class DetailVC: UIViewController {
             castLabel.topAnchor.constraint(equalTo: descLabel.bottomAnchor, constant: 24),
             castLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
         ])
+        
+        setupCollectionView()
+    }
+    
+    private func setupCollectionView() {
+        contentView.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(CastCell.self, forCellWithReuseIdentifier: CastCell.identifier)
+        
+        NSLayoutConstraint.activate([
+            collectionView.topAnchor.constraint(equalTo: castLabel.bottomAnchor, constant: 8.0),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+//            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -39.0),
+            collectionView.heightAnchor.constraint(equalTo: contentView.heightAnchor, constant: 124.0)
+        ])
+    }
+}
+
+extension DetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return casts.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CastCell.identifier, for: indexPath) as! CastCell
+        
+        let castName = casts[indexPath.row]
+        cell.configure(with: castName)
+        
+        return cell
     }
 }

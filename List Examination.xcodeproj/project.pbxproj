@@ -36,6 +36,8 @@
 		EDAB8AB22C39ADC200B42E7B /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED027FE92C39279C007AE287 /* Poppins-Thin.ttf */; };
 		EDAB8AB32C39ADC200B42E7B /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED027FE82C39279C007AE287 /* Poppins-ExtraBold.ttf */; };
 		EDAB8AB42C39ADC200B42E7B /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ED027FE22C39279C007AE287 /* Poppins-ThinItalic.ttf */; };
+		EDAB8AB62C39C05C00B42E7B /* CastCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAB8AB52C39C05C00B42E7B /* CastCell.swift */; };
+		EDAB8AB82C39C09800B42E7B /* UICollectionViewCell+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAB8AB72C39C09800B42E7B /* UICollectionViewCell+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,6 +91,8 @@
 		ED726A022C38648C00A7705F /* List ExaminationUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "List ExaminationUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED726A062C38648C00A7705F /* List_ExaminationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = List_ExaminationUITests.swift; sourceTree = "<group>"; };
 		ED726A082C38648C00A7705F /* List_ExaminationUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = List_ExaminationUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		EDAB8AB52C39C05C00B42E7B /* CastCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastCell.swift; sourceTree = "<group>"; };
+		EDAB8AB72C39C09800B42E7B /* UICollectionViewCell+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICollectionViewCell+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +150,7 @@
 			isa = PBXGroup;
 			children = (
 				ED027FD92C391E4C007AE287 /* MovieCell.swift */,
+				EDAB8AB52C39C05C00B42E7B /* CastCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -154,6 +159,7 @@
 			isa = PBXGroup;
 			children = (
 				ED027FDD2C391EF7007AE287 /* UITableViewCell+Extensions.swift */,
+				EDAB8AB72C39C09800B42E7B /* UICollectionViewCell+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -383,12 +389,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDAB8AB82C39C09800B42E7B /* UICollectionViewCell+Extensions.swift in Sources */,
 				ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */,
 				ED027FD82C390E0C007AE287 /* DetailVC.swift in Sources */,
 				ED027FDE2C391EF7007AE287 /* UITableViewCell+Extensions.swift in Sources */,
 				ED027FD62C390DFE007AE287 /* MainVC.swift in Sources */,
 				ED027FDA2C391E4C007AE287 /* MovieCell.swift in Sources */,
 				ED7269E82C38648A00A7705F /* SceneDelegate.swift in Sources */,
+				EDAB8AB62C39C05C00B42E7B /* CastCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
