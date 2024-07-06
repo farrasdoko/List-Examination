@@ -39,18 +39,6 @@ class MainVC: UIViewController {
         loadNextPage()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        self.navigationController?.setNavigationBarHidden(true, animated: animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        self.navigationController?.setNavigationBarHidden(false, animated: animated)
-    }
-    
     private func setupTableView() {
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
