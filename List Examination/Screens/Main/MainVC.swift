@@ -11,9 +11,16 @@ class MainVC: UIViewController {
     
     // MARK: - Data variables
     let allData = [
-        "Data", "Diti", "Dutu", "Dete", "Doto"
+        "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1",
+        "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2",
+        "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3"
     ]
     var displayedData: [String] = []
+    
+    static let firstPage: Int = 1
+    let pageSize = 10
+    let totalPage = 3
+    var currentPage = MainVC.firstPage
     
     // MARK: - Views
     let tableView = UITableView()
@@ -27,7 +34,7 @@ class MainVC: UIViewController {
         setupRefreshControl()
         setUpSearchController()
         
-        loadData()
+        loadNextPage()
     }
     
     private func setupTableView() {
@@ -37,13 +44,30 @@ class MainVC: UIViewController {
         view.addSubview(tableView)
     }
     
-    func loadData() {
+    func loadNextPage() {
         DispatchQueue.global().async {
-            self.displayedData = self.allData
+            guard self.currentPage <= self.totalPage else { return }
+            let newData = self.fetchData()
+            
             DispatchQueue.main.async {
+                self.displayedData.append(contentsOf: Array(newData.prefix(self.currentPage * self.pageSize)) )
                 self.tableView.reloadData()
+                self.currentPage += 1
             }
         }
+    }
+    
+    func fetchData() -> [String] {
+        
+        let startIndex = (currentPage - 1) * pageSize
+        let endIndex = min(startIndex + pageSize, allData.count)
+        
+        var newData: [String] = []
+        for i in startIndex..<endIndex {
+            newData.append(allData[i])
+        }
+        
+        return newData
     }
     
     // MARK: - Pull to Refresh
@@ -52,9 +76,10 @@ class MainVC: UIViewController {
         tableView.refreshControl = refreshControl
     }
     @objc func refreshData() {
+        currentPage = MainVC.firstPage
         displayedData.removeAll()
         
-        loadData()
+        loadNextPage()
         
         refreshControl.endRefreshing()
     }
@@ -79,6 +104,11 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "Cell")
         
         cell.textLabel?.text = displayedData[indexPath.row]
+        
+        // Load next page on last cell
+        if indexPath.row == displayedData.count - 1 {
+            loadNextPage()
+        }
         
         return cell
     }
