@@ -115,6 +115,10 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        let detailVC = DetailVC()
+        navigationController?.pushViewController(detailVC, animated: true)
+        
         print("You tapped on \(displayedData[indexPath.row])")
     }
 }
