@@ -26,7 +26,7 @@ class CastCell: UICollectionViewCell {
         label.font = UIFont(name: "Poppins-Regular", size: 12.0)
         label.textColor = #colorLiteral(red: 0.4666666667, green: 0.4666666667, blue: 0.4666666667, alpha: 1)
         label.textAlignment = .center
-        label.numberOfLines = 0
+        label.numberOfLines = 2
         return label
     }()
     
