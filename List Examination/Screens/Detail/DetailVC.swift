@@ -9,26 +9,26 @@ import UIKit
 
 class DetailVC: UIViewController {
     
-    lazy var scrollView: UIScrollView = {
+    let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         return scrollView
     }()
     
-    lazy var contentView: UIView = {
+    let contentView: UIView = {
         let contentView = UIView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         return contentView
     }()
     
-    lazy var bannerImg: UIImageView = {
+    let bannerImg: UIImageView = {
         let v = UIImageView()
         v.backgroundColor = #colorLiteral(red: 0.768627451, green: 0.768627451, blue: 0.768627451, alpha: 1)
         v.translatesAutoresizingMaskIntoConstraints = false
         return v
     }()
     
-    lazy var backBtn: UIButton = {
+    let backBtn: UIButton = {
         let v = UIButton()
         v.setImage(#imageLiteral(resourceName: "Back Arrow"), for: .normal)
         v.translatesAutoresizingMaskIntoConstraints = false
@@ -97,6 +97,15 @@ class DetailVC: UIViewController {
         label.font = UIFont(name: "Poppins-SemiBold", size: 14.0)
         label.textColor = .black
         return label
+    }()
+    
+    let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .white
+        return collectionView
     }()
 
     override func viewDidLoad() {
