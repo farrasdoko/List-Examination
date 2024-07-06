@@ -18,12 +18,14 @@ class MainVC: UIViewController {
     // MARK: - Views
     let tableView = UITableView()
     let refreshControl = UIRefreshControl()
+    let searchController = UISearchController(searchResultsController: nil)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupTableView()
         setupRefreshControl()
+        setUpSearchController()
         
         loadData()
     }
@@ -57,6 +59,15 @@ class MainVC: UIViewController {
         refreshControl.endRefreshing()
     }
     
+    // MARK: - Searchable
+    private func setUpSearchController() {
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = true
+        searchController.searchBar.placeholder = "Search"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+    }
+    
 }
 
 extension MainVC: UITableViewDataSource, UITableViewDelegate {
@@ -75,5 +86,20 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         print("You tapped on \(displayedData[indexPath.row])")
+    }
+}
+
+extension MainVC: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        filterContentForSearchText(searchController.searchBar.text ?? "")
+    }
+    
+    func filterContentForSearchText(_ searchText: String) {
+        if searchText.isEmpty {
+            displayedData = allData
+        } else {
+            displayedData = allData.filter { $0.lowercased().contains(searchText.lowercased()) }
+        }
+        tableView.reloadData()
     }
 }
