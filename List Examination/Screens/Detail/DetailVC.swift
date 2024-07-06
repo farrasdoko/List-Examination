@@ -77,6 +77,15 @@ class DetailVC: UIViewController {
         label.numberOfLines = 0
         return label
     }()
+    
+    let castLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Cast"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont(name: "Poppins-SemiBold", size: 14.0)
+        label.textColor = .black
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -127,6 +136,13 @@ class DetailVC: UIViewController {
             descLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descLabel.topAnchor.constraint(equalTo: bannerImg.bottomAnchor, constant: 24),
             descLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+        ])
+        
+        view.addSubview(castLabel)
+        NSLayoutConstraint.activate([
+            castLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            castLabel.topAnchor.constraint(equalTo: descLabel.bottomAnchor, constant: 24),
+            castLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
         ])
     }
 }
