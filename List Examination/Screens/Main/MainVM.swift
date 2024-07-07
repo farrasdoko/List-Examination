@@ -70,7 +70,7 @@ class MovieViewModel {
         
         /*
          
-        // Alternatively, fetch data asynchronously from a network API using combine instead of async await.
+        // Alternatively fetch data asynchronously from a network API using combine instead of async await.
          
         URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
