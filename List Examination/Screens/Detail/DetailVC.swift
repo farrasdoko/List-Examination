@@ -43,7 +43,7 @@ class DetailVC: UIViewController {
         return v
     }()
     
-    @objc func backTapped(_ sender: UIButton) {
+    @objc private func backTapped(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -203,7 +203,7 @@ class DetailVC: UIViewController {
         setupData()
     }
     
-    func setupData() {
+    private func setupData() {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
             // TODO: Zip using combine
@@ -214,7 +214,7 @@ class DetailVC: UIViewController {
         }
     }
     
-    func fetchData() async {
+    private func fetchData() async {
         guard let movieId else { return }
         let url = URL(string: "https://api.themoviedb.org/3/movie/"+String(movieId))!
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -264,7 +264,7 @@ class DetailVC: UIViewController {
         descLabel.text = data?.overview ?? ""
     }
     
-    func fetchCast() async {
+    private func fetchCast() async {
         guard let movieId else { return }
         let url = URL(string: "https://api.themoviedb.org/3/movie/\(String(movieId))/credits")!
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
