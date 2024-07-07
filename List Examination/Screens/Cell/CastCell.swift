@@ -17,6 +17,7 @@ class CastCell: UICollectionViewCell {
         v.backgroundColor = #colorLiteral(red: 0.768627451, green: 0.768627451, blue: 0.768627451, alpha: 1)
         v.layer.cornerRadius = 40
         v.clipsToBounds = true
+        v.contentMode = .scaleAspectFill
         return v
     }()
 

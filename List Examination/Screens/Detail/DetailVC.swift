@@ -31,6 +31,7 @@ class DetailVC: UIViewController {
     let bannerImg: UIImageView = {
         let v = UIImageView()
         v.backgroundColor = #colorLiteral(red: 0.768627451, green: 0.768627451, blue: 0.768627451, alpha: 1)
+        v.contentMode = .scaleAspectFill
         v.translatesAutoresizingMaskIntoConstraints = false
         return v
     }()
@@ -262,6 +263,37 @@ class DetailVC: UIViewController {
         }
         
         descLabel.text = data?.overview ?? ""
+        updateBannerImg()
+    }
+    
+    private func updateBannerImg() {
+        Task {
+            do {
+                guard let backdropPath = data?.backdropPath else {
+                    throw NSError(domain: "BackdropPathError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Backdrop path is nil"])
+                }
+                
+                let urlString = "https://image.tmdb.org/t/p/w500" + backdropPath
+                guard let url = URL(string: urlString) else {
+                    throw NSError(domain: "URLCreationError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
+                }
+                
+                let image = try await loadImageAsync(url: url)
+                DispatchQueue.main.async {
+                    self.bannerImg.image = image
+                }
+            } catch {
+                print("Error loading image: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func loadImageAsync(url: URL) async throws -> UIImage {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        guard let image = UIImage(data: data) else {
+            throw NSError(domain: "ImageDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid image data"])
+        }
+        return image
     }
     
     private func fetchCast() async {
