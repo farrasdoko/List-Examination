@@ -160,7 +160,7 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
         let movieId = movie.id
         
         let detailVC = DetailVC()
-        detailVC.movieId = movieId
+        detailVC.viewModel.movieId = movieId
         navigationController?.pushViewController(detailVC, animated: true)
         
         print("You tapped on \(viewModel.displayedData[indexPath.row])")

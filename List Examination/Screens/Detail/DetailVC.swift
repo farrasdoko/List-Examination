@@ -6,13 +6,13 @@
 //
 
 import UIKit
+import Combine
 
 class DetailVC: UIViewController {
     
     // MARK: - Data variables
-    var casts = [Cast]()
-    var movieId: Int?
-    var data: MovieDetail?
+    var viewModel = MovieDetailViewModel()
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: UI Elements
     
@@ -200,76 +200,52 @@ class DetailVC: UIViewController {
         ])
         
         setupCollectionView()
-        refreshView()
+        
+        viewModel.$data
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshView()
+            }
+            .store(in: &cancellables)
+        viewModel.$casts
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.refreshCast()
+            }
+            .store(in: &cancellables)
+        
         setupData()
     }
     
     private func setupData() {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
-            // TODO: Zip using combine
-            Task {
-                await self.fetchData()
-                await self.fetchCast()
-            }
-        }
-    }
-    
-    private func fetchData() async {
-        guard let movieId else { return }
-        let url = URL(string: "https://api.themoviedb.org/3/movie/"+String(movieId))!
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-        let queryItems: [URLQueryItem] = [
-          URLQueryItem(name: "language", value: "en-US"),
-        ]
-        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
-
-        var request = URLRequest(url: components.url!)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 10
-        request.allHTTPHeaderFields = [
-          "accept": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
-        ]
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            
-            let decoder = JSONDecoder()
-            let movieDetail = try decoder.decode(MovieDetail.self, from: data)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.data = movieDetail
-                self.refreshView()
-            }
-        } catch {
-            print("Error fetching data: \(error)")
+            self.viewModel.fetchDataAndCast()
         }
     }
     
     private func refreshView() {
-        titleLabel.text = data?.title ?? ""
+        titleLabel.text = viewModel.data?.title ?? ""
         
-        if let releaseDate = data?.releaseDate {
+        if let releaseDate = viewModel.data?.releaseDate {
             let components = releaseDate.components(separatedBy: "-")
             let year = components.first ?? ""
             yearLabel.text = year
         }
         
-        if let genres = data?.genres {
+        if let genres = viewModel.data?.genres {
             let genreNames = genres.compactMap { $0.name }.joined(separator: ", ")
             genreLabel.text = genreNames
         }
         
-        descLabel.text = data?.overview ?? ""
+        descLabel.text = viewModel.data?.overview ?? ""
         updateBannerImg()
     }
     
     private func updateBannerImg() {
         Task {
             do {
-                guard let backdropPath = data?.backdropPath else {
+                guard let backdropPath = viewModel.data?.backdropPath else {
                     throw NSError(domain: "BackdropPathError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Backdrop path is nil"])
                 }
                 
@@ -296,38 +272,6 @@ class DetailVC: UIViewController {
         return image
     }
     
-    private func fetchCast() async {
-        guard let movieId else { return }
-        let url = URL(string: "https://api.themoviedb.org/3/movie/\(String(movieId))/credits")!
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-        let queryItems: [URLQueryItem] = [
-          URLQueryItem(name: "language", value: "en-US"),
-        ]
-        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
-
-        var request = URLRequest(url: components.url!)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 10
-        request.allHTTPHeaderFields = [
-          "accept": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
-        ]
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            
-            let decoder = JSONDecoder()
-            let castResult = try decoder.decode(CastResult.self, from: data)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.casts = castResult.cast ?? []
-                self.refreshCast()
-            }
-        } catch {
-            print("Error fetching data: \(error)")
-        }
-    }
     private func refreshCast() {
         collectionView.reloadData()
     }
@@ -351,13 +295,13 @@ class DetailVC: UIViewController {
 
 extension DetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return casts.count
+        return viewModel.casts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CastCell.identifier, for: indexPath) as! CastCell
         
-        let cast = casts[indexPath.row]
+        let cast = viewModel.casts[indexPath.row]
         let castName = cast.name ?? ""
         let profilePath = cast.profilePath ?? ""
         let imageUrl = "https://image.tmdb.org/t/p/w300" + profilePath
