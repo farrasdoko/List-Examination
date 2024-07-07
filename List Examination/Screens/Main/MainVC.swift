@@ -56,7 +56,7 @@ class MainVC: UIViewController {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
             guard self.currentPage <= self.totalPage else { return }
-            async {
+            Task {
                 await self.fetchData()
             }
         }
@@ -83,7 +83,7 @@ class MainVC: UIViewController {
         ]
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, _) = try await URLSession.shared.data(for: request)
             
             let decoder = JSONDecoder()
             let apiResult = try decoder.decode(APIResult.self, from: data)
@@ -99,7 +99,7 @@ class MainVC: UIViewController {
             }
             
             for movie in apiResult.results {
-                print("Movie Title: \(movie.title)")
+                print("Movie Title: \(movie.title ?? "")")
             }
         } catch {
             print("Error fetching data: \(error)")
