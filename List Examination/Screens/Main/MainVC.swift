@@ -10,16 +10,12 @@ import UIKit
 class MainVC: UIViewController {
     
     // MARK: - Data variables
-    let allData = [
-        "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1", "Page 1",
-        "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2", "Page 2",
-        "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3", "Page 3"
-    ]
-    var displayedData: [String] = []
+    var allData = [Movie]()
+    var displayedData: [Movie] = []
+    var isSearching = false
     
     static let firstPage: Int = 1
-    let pageSize = 10
-    let totalPage = 3
+    var totalPage = 3
     var currentPage = MainVC.firstPage
     
     // MARK: - UI Elements
@@ -57,29 +53,57 @@ class MainVC: UIViewController {
     // MARK: - Pagination
     
     func loadNextPage() {
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
             guard self.currentPage <= self.totalPage else { return }
-            let newData = self.fetchData()
-            
-            DispatchQueue.main.async {
-                self.displayedData.append(contentsOf: Array(newData.prefix(self.currentPage * self.pageSize)) )
-                self.tableView.reloadData()
-                self.currentPage += 1
+            async {
+                await self.fetchData()
             }
         }
     }
     
-    func fetchData() -> [String] {
+    func fetchData() async {
+        let url = URL(string: "https://api.themoviedb.org/3/discover/movie")!
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+        let queryItems: [URLQueryItem] = [
+          URLQueryItem(name: "include_adult", value: "false"),
+          URLQueryItem(name: "include_video", value: "false"),
+          URLQueryItem(name: "language", value: "en-US"),
+          URLQueryItem(name: "page", value: String(currentPage)),
+          URLQueryItem(name: "sort_by", value: "popularity.desc"),
+        ]
+        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
+
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 10
+        request.allHTTPHeaderFields = [
+          "accept": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
+        ]
         
-        let startIndex = (currentPage - 1) * pageSize
-        let endIndex = min(startIndex + pageSize, allData.count)
-        
-        var newData: [String] = []
-        for i in startIndex..<endIndex {
-            newData.append(allData[i])
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            let decoder = JSONDecoder()
+            let apiResult = try decoder.decode(APIResult.self, from: data)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.allData.append(contentsOf: apiResult.results)
+                self.displayedData.append(contentsOf: apiResult.results)
+                self.tableView.reloadData()
+                
+                currentPage = apiResult.page + 1
+                totalPage = apiResult.totalPages
+            }
+            
+            for movie in apiResult.results {
+                print("Movie Title: \(movie.title)")
+            }
+        } catch {
+            print("Error fetching data: \(error)")
         }
-        
-        return newData
     }
     
     // MARK: - Pull to Refresh
@@ -89,6 +113,7 @@ class MainVC: UIViewController {
     }
     @objc func refreshData() {
         currentPage = MainVC.firstPage
+        allData.removeAll()
         displayedData.removeAll()
         
         loadNextPage()
@@ -150,9 +175,11 @@ class MainVC: UIViewController {
     
     func filterContentForSearchText(_ searchText: String) {
         if searchText.isEmpty {
+            isSearching = false
             displayedData = allData
         } else {
-            displayedData = allData.filter { $0.lowercased().contains(searchText.lowercased()) }
+            isSearching = true
+            displayedData = allData.filter { ($0.title ?? "").lowercased().contains(searchText.lowercased()) || ($0.originalTitle ?? "").lowercased().contains(searchText.lowercased()) }
         }
         tableView.reloadData()
     }
@@ -167,14 +194,15 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MovieCell.identifier) as! MovieCell
         
-        let movieTitle = displayedData[indexPath.row]
+        let movie = displayedData[indexPath.row]
+        let movieTitle = movie.title ?? ""
         let movieYear = "2022"
         let movieGenre = "Drama, Asia, Comedy, Series"
         
         cell.configure(with: movieTitle, year: movieYear, genre: movieGenre)
         
         // Load next page on last cell
-        if indexPath.row == displayedData.count - 1 {
+        if !isSearching && indexPath.row == displayedData.count - 1 {
             loadNextPage()
         }
         
