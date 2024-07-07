@@ -52,7 +52,7 @@ class MainVC: UIViewController {
     
     // MARK: - Pagination
     
-    func loadNextPage() {
+    private func loadNextPage() {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
             guard self.currentPage <= self.totalPage else { return }
@@ -62,7 +62,7 @@ class MainVC: UIViewController {
         }
     }
     
-    func fetchData() async {
+    private func fetchData() async {
         let url = URL(string: "https://api.themoviedb.org/3/discover/movie")!
         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
         let queryItems: [URLQueryItem] = [
@@ -111,7 +111,7 @@ class MainVC: UIViewController {
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         tableView.refreshControl = refreshControl
     }
-    @objc func refreshData() {
+    @objc private func refreshData() {
         currentPage = MainVC.firstPage
         allData.removeAll()
         displayedData.removeAll()
@@ -173,7 +173,7 @@ class MainVC: UIViewController {
         filterContentForSearchText(searchTf.text ?? "")
     }
     
-    func filterContentForSearchText(_ searchText: String) {
+    private func filterContentForSearchText(_ searchText: String) {
         if searchText.isEmpty {
             isSearching = false
             displayedData = allData
@@ -199,7 +199,10 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
         let movieYear = "2022"
         let movieGenre = "Drama, Asia, Comedy, Series"
         
-        cell.configure(with: movieTitle, year: movieYear, genre: movieGenre)
+        let posterPath = movie.posterPath ?? ""
+        let imageUrl = "https://image.tmdb.org/t/p/w300" + posterPath
+        
+        cell.configure(with: movieTitle, year: movieYear, genre: movieGenre, imageUrl: imageUrl)
         
         // Load next page on last cell
         if !isSearching && indexPath.row == displayedData.count - 1 {
@@ -212,7 +215,11 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
+        let movie = displayedData[indexPath.row]
+        let movieId = movie.id
+        
         let detailVC = DetailVC()
+        detailVC.movieId = movieId
         navigationController?.pushViewController(detailVC, animated: true)
         
         print("You tapped on \(displayedData[indexPath.row])")

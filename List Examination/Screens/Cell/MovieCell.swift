@@ -9,6 +9,10 @@ import UIKit
 
 class MovieCell: UITableViewCell {
     
+    // MARK: Other property
+    var imageURL: URL?
+    var task: URLSessionDataTask?
+    
     // MARK: - UI Elements
     
     let movieBanner: UIImageView = {
@@ -81,10 +85,46 @@ class MovieCell: UITableViewCell {
             genreLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: 0),
         ])
     }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        task?.cancel()
+        task = nil
+        
+        movieBanner.image = nil
+    }
 
-    func configure(with title: String, year: String, genre: String) {
+    func configure(with title: String, year: String, genre: String, imageUrl: String) {
         titleLabel.text = title
         yearLabel.text = year
         genreLabel.text = genre
+        
+        guard let imageURL = URL(string: imageUrl) else { return }
+        self.imageURL = imageURL
+        if let cachedImage = ImageCache.shared.image(for: imageURL) {
+            movieBanner.image = cachedImage
+        } else {
+            task = loadImage(from: imageURL) { [weak self] image in
+                guard let self = self, let image = image else { return }
+                DispatchQueue.main.async {
+                    if self.imageURL == imageURL {
+                        self.movieBanner.image = image
+                    }
+                }
+                ImageCache.shared.saveImage(image, for: imageURL)
+            }
+            task?.resume()
+        }
+    }
+    
+    private func loadImage(from url: URL, completion: @escaping (UIImage?) -> Void) -> URLSessionDataTask? {
+        return URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, let image = UIImage(data: data) else {
+                completion(nil)
+                return
+            }
+            completion(image)
+        }
     }
 }
