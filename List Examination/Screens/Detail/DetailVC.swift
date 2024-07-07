@@ -40,7 +40,6 @@ class DetailVC: UIViewController {
         let v = UIButton()
         v.setImage(#imageLiteral(resourceName: "Back Arrow"), for: .normal)
         v.translatesAutoresizingMaskIntoConstraints = false
-        v.addTarget(self, action: #selector(backTapped(_:)), for: .touchUpInside)
         return v
     }()
     
@@ -160,6 +159,7 @@ class DetailVC: UIViewController {
         hdStack.translatesAutoresizingMaskIntoConstraints = false
         
         contentView.addSubview(bannerImg)
+        backBtn.addTarget(self, action: #selector(backTapped(_:)), for: .touchUpInside)
         contentView.addSubview(backBtn)
         NSLayoutConstraint.activate([
             bannerImg.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
@@ -208,7 +208,7 @@ class DetailVC: UIViewController {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
             // TODO: Zip using combine
-            async {
+            Task {
                 await self.fetchData()
                 await self.fetchCast()
             }
@@ -233,7 +233,7 @@ class DetailVC: UIViewController {
         ]
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, _) = try await URLSession.shared.data(for: request)
             
             let decoder = JSONDecoder()
             let movieDetail = try decoder.decode(MovieDetail.self, from: data)
@@ -314,7 +314,7 @@ class DetailVC: UIViewController {
         ]
         
         do {
-            let (data, response) = try await URLSession.shared.data(for: request)
+            let (data, _) = try await URLSession.shared.data(for: request)
             
             let decoder = JSONDecoder()
             let castResult = try decoder.decode(CastResult.self, from: data)
