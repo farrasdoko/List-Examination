@@ -11,6 +11,8 @@ class DetailVC: UIViewController {
     
     // MARK: - Data variables
     let casts = ["Dave Franco", "Alexa Kee", "Fernando Abigail", "Dave Franco"]
+    var movieId: Int?
+    var data: MovieDetail?
     
     // MARK: UI Elements
     
@@ -196,6 +198,68 @@ class DetailVC: UIViewController {
         ])
         
         setupCollectionView()
+        refreshView()
+        setupData()
+    }
+    
+    func setupData() {
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+            async {
+                await self.fetchData()
+            }
+        }
+    }
+    
+    func fetchData() async {
+        guard let movieId else { return }
+        let url = URL(string: "https://api.themoviedb.org/3/movie/"+String(movieId))!
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+        let queryItems: [URLQueryItem] = [
+          URLQueryItem(name: "language", value: "en-US"),
+        ]
+        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
+
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 10
+        request.allHTTPHeaderFields = [
+          "accept": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
+        ]
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            let decoder = JSONDecoder()
+            let movieDetail = try decoder.decode(MovieDetail.self, from: data)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.data = movieDetail
+                self.refreshView()
+            }
+        } catch {
+            print("Error fetching data: \(error)")
+        }
+    }
+    
+    private func refreshView() {
+        titleLabel.text = data?.title ?? ""
+        
+        if let releaseDate = data?.releaseDate {
+            let components = releaseDate.components(separatedBy: "-")
+            let year = components.first ?? ""
+            yearLabel.text = year
+        }
+        
+        if let genres = data?.genres {
+            let genreNames = genres.compactMap { $0.name }.joined(separator: ", ")
+            genreLabel.text = genreNames
+        }
+        
+        descLabel.text = data?.overview ?? ""
+        collectionView.reloadData()
     }
     
     private func setupCollectionView() {
