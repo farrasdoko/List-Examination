@@ -10,7 +10,7 @@ import UIKit
 class DetailVC: UIViewController {
     
     // MARK: - Data variables
-    let casts = ["Dave Franco", "Alexa Kee", "Fernando Abigail", "Dave Franco"]
+    var casts = [Cast]()
     var movieId: Int?
     var data: MovieDetail?
     
@@ -118,6 +118,7 @@ class DetailVC: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
+        collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
     
@@ -205,8 +206,10 @@ class DetailVC: UIViewController {
     func setupData() {
         DispatchQueue.global().async { [weak self] in
             guard let self else { return }
+            // TODO: Zip using combine
             async {
                 await self.fetchData()
+                await self.fetchCast()
             }
         }
     }
@@ -259,6 +262,41 @@ class DetailVC: UIViewController {
         }
         
         descLabel.text = data?.overview ?? ""
+    }
+    
+    func fetchCast() async {
+        guard let movieId else { return }
+        let url = URL(string: "https://api.themoviedb.org/3/movie/\(String(movieId))/credits")!
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+        let queryItems: [URLQueryItem] = [
+          URLQueryItem(name: "language", value: "en-US"),
+        ]
+        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
+
+        var request = URLRequest(url: components.url!)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 10
+        request.allHTTPHeaderFields = [
+          "accept": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
+        ]
+        
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            let decoder = JSONDecoder()
+            let castResult = try decoder.decode(CastResult.self, from: data)
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                self.casts = castResult.cast ?? []
+                self.refreshCast()
+            }
+        } catch {
+            print("Error fetching data: \(error)")
+        }
+    }
+    private func refreshCast() {
         collectionView.reloadData()
     }
     
@@ -287,7 +325,8 @@ extension DetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CastCell.identifier, for: indexPath) as! CastCell
         
-        let castName = casts[indexPath.row]
+        let cast = casts[indexPath.row]
+        let castName = cast.name ?? ""
         cell.configure(with: castName)
         
         return cell
