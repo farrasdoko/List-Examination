@@ -9,6 +9,10 @@ import UIKit
 
 class CastCell: UICollectionViewCell {
     
+    // MARK: Other property
+    var imageURL: URL?
+    var task: URLSessionDataTask?
+    
     // MARK: - UI Elements
     
     let castBanner: UIImageView = {
@@ -58,7 +62,44 @@ class CastCell: UICollectionViewCell {
         ])
     }
 
-    func configure(with name: String) {
+    func configure(with name: String, imageUrl: String) {
         titleLabel.text = name
+        castBanner.image = nil
+        
+        guard let imageURL = URL(string: imageUrl) else { return }
+        self.imageURL = imageURL
+        if let cachedImage = ImageCache.shared.image(for: imageURL) {
+            castBanner.image = cachedImage
+        } else {
+            task = loadImage(from: imageURL) { [weak self] image in
+                guard let self = self, let image = image else { return }
+                DispatchQueue.main.async {
+                    if self.imageURL == imageURL {
+                        self.castBanner.image = image
+                    }
+                }
+                ImageCache.shared.saveImage(image, for: imageURL)
+            }
+            task?.resume()
+        }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        task?.cancel()
+        task = nil
+        
+        castBanner.image = nil
+    }
+    
+    private func loadImage(from url: URL, completion: @escaping (UIImage?) -> Void) -> URLSessionDataTask? {
+        return URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, let image = UIImage(data: data) else {
+                completion(nil)
+                return
+            }
+            completion(image)
+        }
     }
 }

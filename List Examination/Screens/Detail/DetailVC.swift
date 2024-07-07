@@ -288,7 +288,7 @@ class DetailVC: UIViewController {
         }
     }
     
-    func loadImageAsync(url: URL) async throws -> UIImage {
+    private func loadImageAsync(url: URL) async throws -> UIImage {
         let (data, _) = try await URLSession.shared.data(from: url)
         guard let image = UIImage(data: data) else {
             throw NSError(domain: "ImageDataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid image data"])
@@ -359,7 +359,9 @@ extension DetailVC: UICollectionViewDelegate, UICollectionViewDataSource {
         
         let cast = casts[indexPath.row]
         let castName = cast.name ?? ""
-        cell.configure(with: castName)
+        let profilePath = cast.profilePath ?? ""
+        let imageUrl = "https://image.tmdb.org/t/p/w300" + profilePath
+        cell.configure(with: castName, imageUrl: imageUrl)
         
         return cell
     }
