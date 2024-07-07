@@ -37,8 +37,13 @@ class DetailVC: UIViewController {
         let v = UIButton()
         v.setImage(#imageLiteral(resourceName: "Back Arrow"), for: .normal)
         v.translatesAutoresizingMaskIntoConstraints = false
+        v.addTarget(self, action: #selector(backTapped(_:)), for: .touchUpInside)
         return v
     }()
+    
+    @objc func backTapped(_ sender: UIButton) {
+        self.navigationController?.popViewController(animated: true)
+    }
     
     let titleLabel: UILabel = {
         let label = UILabel()
@@ -48,7 +53,7 @@ class DetailVC: UIViewController {
         label.textColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
         return label
     }()
-
+    
     let yearLabel: UILabel = {
         let label = UILabel()
         label.text = "1 h 29 m"
@@ -113,7 +118,7 @@ class DetailVC: UIViewController {
         collectionView.backgroundColor = .clear
         return collectionView
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -198,6 +203,7 @@ class DetailVC: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(CastCell.self, forCellWithReuseIdentifier: CastCell.identifier)
+        collectionView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: castLabel.bottomAnchor, constant: 8.0),
