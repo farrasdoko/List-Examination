@@ -273,7 +273,7 @@ class DetailVC: UIViewController {
                     throw NSError(domain: "BackdropPathError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Backdrop path is nil"])
                 }
                 
-                let urlString = "https://image.tmdb.org/t/p/w500" + backdropPath
+                let urlString = "https://image.tmdb.org/t/p/original" + backdropPath
                 guard let url = URL(string: urlString) else {
                     throw NSError(domain: "URLCreationError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
                 }

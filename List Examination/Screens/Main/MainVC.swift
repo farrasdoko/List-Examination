@@ -6,17 +6,13 @@
 //
 
 import UIKit
+import Combine
 
 class MainVC: UIViewController {
     
     // MARK: - Data variables
-    var allData = [Movie]()
-    var displayedData: [Movie] = []
-    var isSearching = false
-    
-    static let firstPage: Int = 1
-    var totalPage = 3
-    var currentPage = MainVC.firstPage
+    private var viewModel = MovieViewModel()
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - UI Elements
     let tableView = UITableView()
@@ -48,62 +44,20 @@ class MainVC: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        
+        viewModel.$displayedData
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] _ in
+                self?.tableView.reloadData()
+                self?.refreshControl.endRefreshing()
+            }
+            .store(in: &cancellables)
     }
     
     // MARK: - Pagination
     
     private func loadNextPage() {
-        DispatchQueue.global().async { [weak self] in
-            guard let self else { return }
-            guard self.currentPage <= self.totalPage else { return }
-            Task {
-                await self.fetchData()
-            }
-        }
-    }
-    
-    private func fetchData() async {
-        let url = URL(string: "https://api.themoviedb.org/3/discover/movie")!
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
-        let queryItems: [URLQueryItem] = [
-          URLQueryItem(name: "include_adult", value: "false"),
-          URLQueryItem(name: "include_video", value: "false"),
-          URLQueryItem(name: "language", value: "en-US"),
-          URLQueryItem(name: "page", value: String(currentPage)),
-          URLQueryItem(name: "sort_by", value: "popularity.desc"),
-        ]
-        components.queryItems = components.queryItems.map { $0 + queryItems } ?? queryItems
-
-        var request = URLRequest(url: components.url!)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 10
-        request.allHTTPHeaderFields = [
-          "accept": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlM2Q1YWIzNjdlYTY3ZGY1OTg1ZjYyYTJkMjExOGQyZCIsIm5iZiI6MTcyMDM0NTc4Mi41NzA5NDEsInN1YiI6IjVhZDAwMzI4OTI1MTQxN2I2MDAwNDYxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.jeuj_kdlpGm4qVPaCYstpiY3yFpBkshjNiHCU5VuqhY"
-        ]
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            
-            let decoder = JSONDecoder()
-            let apiResult = try decoder.decode(APIResult.self, from: data)
-            
-            DispatchQueue.main.async { [weak self] in
-                guard let self else { return }
-                self.allData.append(contentsOf: apiResult.results)
-                self.displayedData.append(contentsOf: apiResult.results)
-                self.tableView.reloadData()
-                
-                currentPage = apiResult.page + 1
-                totalPage = apiResult.totalPages
-            }
-            
-            for movie in apiResult.results {
-                print("Movie Title: \(movie.title ?? "")")
-            }
-        } catch {
-            print("Error fetching data: \(error)")
-        }
+        viewModel.loadNextPage()
     }
     
     // MARK: - Pull to Refresh
@@ -112,13 +66,7 @@ class MainVC: UIViewController {
         tableView.refreshControl = refreshControl
     }
     @objc private func refreshData() {
-        currentPage = MainVC.firstPage
-        allData.removeAll()
-        displayedData.removeAll()
-        
-        loadNextPage()
-        
-        refreshControl.endRefreshing()
+        viewModel.refreshData()
     }
     
     // MARK: - Searchable
@@ -174,27 +122,20 @@ class MainVC: UIViewController {
     }
     
     private func filterContentForSearchText(_ searchText: String) {
-        if searchText.isEmpty {
-            isSearching = false
-            displayedData = allData
-        } else {
-            isSearching = true
-            displayedData = allData.filter { ($0.title ?? "").lowercased().contains(searchText.lowercased()) || ($0.originalTitle ?? "").lowercased().contains(searchText.lowercased()) }
-        }
-        tableView.reloadData()
+        viewModel.filterContentForSearchText(searchText)
     }
     
 }
 
 extension MainVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return displayedData.count
+        return viewModel.displayedData.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: MovieCell.identifier) as! MovieCell
         
-        let movie = displayedData[indexPath.row]
+        let movie = viewModel.displayedData[indexPath.row]
         let movieTitle = movie.title ?? ""
         let movieYear = "2022"
         let movieGenre = "Drama, Asia, Comedy, Series"
@@ -205,7 +146,7 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
         cell.configure(with: movieTitle, year: movieYear, genre: movieGenre, imageUrl: imageUrl)
         
         // Load next page on last cell
-        if !isSearching && indexPath.row == displayedData.count - 1 {
+        if !viewModel.isSearching && indexPath.row == viewModel.displayedData.count - 1 {
             loadNextPage()
         }
         
@@ -215,14 +156,14 @@ extension MainVC: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        let movie = displayedData[indexPath.row]
+        let movie = viewModel.displayedData[indexPath.row]
         let movieId = movie.id
         
         let detailVC = DetailVC()
         detailVC.movieId = movieId
         navigationController?.pushViewController(detailVC, animated: true)
         
-        print("You tapped on \(displayedData[indexPath.row])")
+        print("You tapped on \(viewModel.displayedData[indexPath.row])")
     }
 }
 
