@@ -24,13 +24,15 @@ final class RemoteMovieLoader {
         self.client = client
     }
     
-    func load() async -> Result {
-        let result = await client.get(from: url)
-        switch result {
-        case let .success(data, response):
-            return map(data, from: response)
-        case .failure:
-            return .failed(Error.connectivity)
+    func load(completion: @escaping(Result) -> Void) {
+        client.get(from: url) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case let .success(data, response):
+                completion(map(data, from: response))
+            case .failure:
+                completion(.failed(Error.connectivity))
+            }
         }
     }
     

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct APIResult: Codable {
+struct APIResult: Codable, Equatable {
     let page: Int
     let results: [Movie]
     let totalPages, totalResults: Int

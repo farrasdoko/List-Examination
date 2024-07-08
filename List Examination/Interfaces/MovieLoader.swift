@@ -9,7 +9,7 @@ import Foundation
 
 enum LoadMovieResult {
     case success(APIResult)
-    case failed(Error)
+    case failed(RemoteMovieLoader.Error)
 }
 
 protocol MovieLoader {

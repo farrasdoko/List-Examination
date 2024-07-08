@@ -6,40 +6,31 @@
 //
 
 import XCTest
+import Combine
 @testable import List_Examination
 
-class HTTPClientSpy: HTTPClient {
+private class HTTPClientSpy: HTTPClient {
+    private var messages = [(url: URL, completion: (HTTPClientResult) -> Void)]()
     
-    var urls: [URL] = []
-    var error: Error?
-    var success: (data: Data, response: HTTPURLResponse)!
+    var urls: [URL] {
+        return messages.map { $0.url }
+    }
     
-    func get(from url: URL) async -> HTTPClientResult {
-        let result: HTTPClientResult
-        if let error {
-            result = .failure(error)
-        } else {
-            if success == nil {
-                result = .failure(RemoteMovieLoader.Error.unknownError)
-            } else {
-                result = .success(success.data, success.response)
-            }
-        }
-        urls.append(url)
-        return result
+    func get(from url: URL, completion: @escaping (HTTPClientResult) -> Void) {
+        messages.append((url, completion))
     }
     
     func complete(with error: Error, at index: Int = 0) {
-        self.error = error
+        messages[index].completion(.failure(error))
     }
     
-    func complete(on url: URL, withStatusCode code: Int, data: Data) {
+    func complete(withStatusCode code: Int, data: Data, at index: Int = 0) {
         let response = HTTPURLResponse(
-            url: url,
+            url: urls[index],
             statusCode: code,
             httpVersion: nil,
             headerFields: nil)!
-        self.success = (data, response)
+        messages[index].completion(.success(data, response))
     }
 }
 
@@ -54,79 +45,63 @@ class RemoteMovieLoaderTests: XCTestCase {
         let expectation = XCTestExpectation(description: "Fetch data expectation")
         let (sut, client) = makeSUT()
         
-        Task {
-            _ = await sut.load()
-            expectation.fulfill()
-            XCTAssertFalse(client.urls.isEmpty)
-        }
+        sut.load { _ in }
         
-        wait(for: [expectation], timeout: 5.0)
+        XCTAssertFalse(client.urls.isEmpty)
     }
     
     func test_loadTwice_requestsDataFromUrlTwice() {
-        let expectation = XCTestExpectation(description: "Fetch data expectation")
-        let expectation2 = XCTestExpectation(description: "Fetch data expectation")
         let (sut, client) = makeSUT()
         
-        Task {
-            let movieResult = await sut.load()
-            let movieResult2 = await sut.load()
-            
-            switch movieResult {
-            case .success(_):
-                expectation.fulfill()
-            case .failed(_):
-                expectation.fulfill()
-            }
-            
-            switch movieResult2 {
-            case .success(_):
-                expectation2.fulfill()
-            case .failed(_):
-                expectation2.fulfill()
-            }
-            
-            XCTAssertEqual(client.urls.count, 2)
-        }
-        wait(for: [expectation, expectation2], timeout: 5.0)
+        sut.load { _ in }
+        sut.load { _ in }
+        
+        XCTAssertEqual(client.urls.count, 2)
     }
     
     func test_load_deliversErrorOnClientError() {
-        let expectation = XCTestExpectation(description: "Fetch data expectation")
         let (sut, client) = makeSUT()
-        let clientError = NSError (domain: "Test", code: 0)
-        client.complete(with: clientError)
         
-        Task {
-            var capturedError = [Error]()
-            let movieResult = await sut.load()
-            
-            switch movieResult {
-            case .success(_):
-                expectation.fulfill()
-                XCTAssertEqual(capturedError.count, 1)
-            case .failed(let error):
-                expectation.fulfill()
-                capturedError.append(error)
-                XCTAssertEqual(capturedError.count, 1)
-            }
+        expect(sut, toCompleteWith: .failed(.connectivity), when: {
+            let clientError = NSError(domain: "Test", code: 0)
+            client.complete(with: clientError)
+        })
+    }
+    
+    func test_load_deliversErrorOnNon200HTTPResponse() {
+        let (sut, client) = makeSUT()
+        let samples = [199, 201, 300, 400, 500]
+        
+        samples.enumerated().forEach { index, code in
+            expect(sut, toCompleteWith: .failed(.invalidData), when: {
+                let json = makeAPIResultJSON()
+                client.complete(withStatusCode: code, data: json, at: index)
+            })
         }
+    }
+    
+    func test_load_success200() {
+        let (sut, client) = makeSUT()
+        let samples = [200]
         
-        wait(for: [expectation], timeout: 5.0)
+        let apiResult = makeAPIResultDummy()
+        
+        samples.enumerated().forEach { _, code in
+            expect(sut, toCompleteWith: .success(apiResult), when: {
+                let json = makeAPIResultJSON()
+                client.complete(withStatusCode: code, data: json)
+            })
+        }
     }
     
     func test_load_checkErrorOnClientSucceed() {
         let expectation = XCTestExpectation(description: "Fetch data expectation")
         let (sut, client) = makeSUT()
         
-        let apiResult = APIResult(page: 0, results: [], totalPages: 0, totalResults: 0)
-        let data = try! JSONEncoder().encode(apiResult)
-        client.complete(on: URL(string: "https://a.com")!, withStatusCode: 200, data: data)
+        let json = makeAPIResultJSON()
         
-        Task {
+        sut.load { movieResult in
             var capturedError = [Error]()
-            let movieResult = await sut.load()
-            
             switch movieResult {
             case .success(_):
                 expectation.fulfill()
@@ -137,6 +112,8 @@ class RemoteMovieLoaderTests: XCTestCase {
                 XCTAssertEqual(capturedError.count, 0)
             }
         }
+        
+        client.complete(withStatusCode: 200, data: json)
         
         wait(for: [expectation], timeout: 5.0)
     }
@@ -144,5 +121,37 @@ class RemoteMovieLoaderTests: XCTestCase {
     private func makeSUT(url: URL = URL(string: "https://api.themoviedb.org/")!) -> (sut: RemoteMovieLoader, client: HTTPClientSpy) {
         let client = HTTPClientSpy()
         return (sut: RemoteMovieLoader(url: url, client: client), client: client)
+    }
+    
+    private func expect(_ sut: RemoteMovieLoader, toCompleteWith expectedResult: RemoteMovieLoader.Result, when action: () -> Void, file: StaticString = #file, line: UInt = #line){
+        let exp = expectation(description: "Wait for load completion")
+        
+        sut.load { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case let (.success(receivedItems), .success(expectedItems)):
+                XCTAssertEqual(receivedItems, expectedItems, file: file, line: line)
+                
+            case let (.failed(receivedError as RemoteMovieLoader.Error), .failed(expectedError as RemoteMovieLoader.Error)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+                
+            default:
+                XCTFail("Expected result \(expectedResult) got \(receivedResult) instead", file: file, line: line)
+            }
+            
+            exp.fulfill()
+        }
+        
+        action()
+        
+        wait(for: [exp], timeout: 10.0)
+    }
+    
+    private func makeAPIResultJSON(result: APIResult = APIResult(page: 0, results: [], totalPages: 0, totalResults: 0)) -> Data {
+        let data = try! JSONEncoder().encode(result)
+        return data
+    }
+    
+    private func makeAPIResultDummy() -> APIResult {
+        return APIResult(page: 0, results: [], totalPages: 0, totalResults: 0)
     }
 }
