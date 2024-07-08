@@ -9,16 +9,37 @@ import XCTest
 @testable import List_Examination
 
 class HTTPClientSpy: HTTPClient {
+    
     var urls: [URL] = []
     var error: Error?
+    var success: (data: Data, response: HTTPURLResponse)!
     
-    func get(from url: URL) async -> LoadMovieResult {
-        self.urls.append(url)
+    func get(from url: URL) async -> HTTPClientResult {
+        let result: HTTPClientResult
         if let error {
-            return .failed(error)
+            result = .failure(error)
         } else {
-            return .success(APIResult(page: 0, results: [], totalPages: 0, totalResults: 0))
+            if success == nil {
+                result = .failure(RemoteMovieLoader.Error.unknownError)
+            } else {
+                result = .success(success.data, success.response)
+            }
         }
+        urls.append(url)
+        return result
+    }
+    
+    func complete(with error: Error, at index: Int = 0) {
+        self.error = error
+    }
+    
+    func complete(on url: URL, withStatusCode code: Int, data: Data) {
+        let response = HTTPURLResponse(
+            url: url,
+            statusCode: code,
+            httpVersion: nil,
+            headerFields: nil)!
+        self.success = (data, response)
     }
 }
 
@@ -73,7 +94,8 @@ class RemoteMovieLoaderTests: XCTestCase {
     func test_load_deliversErrorOnClientError() {
         let expectation = XCTestExpectation(description: "Fetch data expectation")
         let (sut, client) = makeSUT()
-        client.error = NSError (domain: "Test", code: 0)
+        let clientError = NSError (domain: "Test", code: 0)
+        client.complete(with: clientError)
         
         Task {
             var capturedError = [Error]()
@@ -95,7 +117,11 @@ class RemoteMovieLoaderTests: XCTestCase {
     
     func test_load_checkErrorOnClientSucceed() {
         let expectation = XCTestExpectation(description: "Fetch data expectation")
-        let (sut, _) = makeSUT()
+        let (sut, client) = makeSUT()
+        
+        let apiResult = APIResult(page: 0, results: [], totalPages: 0, totalResults: 0)
+        let data = try! JSONEncoder().encode(apiResult)
+        client.complete(on: URL(string: "https://a.com")!, withStatusCode: 200, data: data)
         
         Task {
             var capturedError = [Error]()
