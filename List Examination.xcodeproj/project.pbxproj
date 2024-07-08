@@ -22,6 +22,7 @@
 		ED26F0FF2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F0FE2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift */; };
 		ED26F1022C3B96F900766F89 /* RemoteMovieLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */; };
 		ED26F1042C3BB51F00766F89 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F1032C3BB51F00766F89 /* HTTPClient.swift */; };
+		ED26F1062C3C0F2700766F89 /* RealHttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F1052C3C0F2700766F89 /* RealHttpClient.swift */; };
 		ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E52C38648A00A7705F /* AppDelegate.swift */; };
 		ED7269E82C38648A00A7705F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E72C38648A00A7705F /* SceneDelegate.swift */; };
 		ED7269EF2C38648C00A7705F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED7269EE2C38648C00A7705F /* Assets.xcassets */; };
@@ -92,6 +93,7 @@
 		ED26F0FE2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMovieLoaderTests.swift; sourceTree = "<group>"; };
 		ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMovieLoader.swift; sourceTree = "<group>"; };
 		ED26F1032C3BB51F00766F89 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		ED26F1052C3C0F2700766F89 /* RealHttpClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealHttpClient.swift; sourceTree = "<group>"; };
 		ED7269E22C38648A00A7705F /* List Examination.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "List Examination.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED7269E52C38648A00A7705F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ED7269E72C38648A00A7705F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 			children = (
 				ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */,
 				ED26F1032C3BB51F00766F89 /* HTTPClient.swift */,
+				ED26F1052C3C0F2700766F89 /* RealHttpClient.swift */,
 			);
 			path = "API Handling";
 			sourceTree = "<group>";
@@ -393,6 +396,7 @@
 			files = (
 				EDAB8AB82C39C09800B42E7B /* UICollectionViewCell+Extensions.swift in Sources */,
 				ED26F0F32C3AFA9500766F89 /* ImageCache.swift in Sources */,
+				ED26F1062C3C0F2700766F89 /* RealHttpClient.swift in Sources */,
 				ED26F1022C3B96F900766F89 /* RemoteMovieLoader.swift in Sources */,
 				ED26F0EC2C3AAA3500766F89 /* APIResult.swift in Sources */,
 				ED26F0FB2C3B854B00766F89 /* MovieLoader.swift in Sources */,
