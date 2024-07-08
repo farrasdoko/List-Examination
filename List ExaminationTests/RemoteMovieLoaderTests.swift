@@ -6,29 +6,14 @@
 //
 
 import XCTest
-
-class RemoteMovieLoader {
-    let url: URL
-    let client: HTTPClient
-    
-    init(url: URL, client: HTTPClient) {
-        self.url = url
-        self.client = client
-    }
-    
-    func load() {
-        client.get(from: url)
-    }
-}
-
-protocol HTTPClient {
-    func get(from url: URL)
-}
+@testable import List_Examination
 
 class HTTPClientSpy: HTTPClient {
     var url: URL?
+    var urls: [URL] = []
     func get(from url: URL) {
         self.url = url
+        self.urls.append(url)
     }
 }
 
@@ -39,11 +24,21 @@ class RemoteMovieLoaderTests: XCTestCase {
         XCTAssertNil(client.url)
     }
     
-    func test_load_requestDataFromUrl() {
+    func test_load_requestsDataFromUrl() {
         let (sut, client) = makeSUT()
         
         sut.load()
         
+        XCTAssertNotNil(client.url)
+    }
+    
+    func test_loadTwice_requestsDataFromUrlTwice() {
+        let (sut, client) = makeSUT()
+        
+        sut.load()
+        sut.load()
+        
+        XCTAssertEqual(client.urls.count, 2)
         XCTAssertNotNil(client.url)
     }
     

@@ -20,6 +20,7 @@
 		ED26F0F72C3B164F00766F89 /* DetailVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F0F62C3B164F00766F89 /* DetailVM.swift */; };
 		ED26F0FB2C3B854B00766F89 /* MovieLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F0FA2C3B854B00766F89 /* MovieLoader.swift */; };
 		ED26F0FF2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F0FE2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift */; };
+		ED26F1022C3B96F900766F89 /* RemoteMovieLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */; };
 		ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E52C38648A00A7705F /* AppDelegate.swift */; };
 		ED7269E82C38648A00A7705F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED7269E72C38648A00A7705F /* SceneDelegate.swift */; };
 		ED7269EF2C38648C00A7705F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED7269EE2C38648C00A7705F /* Assets.xcassets */; };
@@ -88,6 +89,7 @@
 		ED26F0F62C3B164F00766F89 /* DetailVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailVM.swift; sourceTree = "<group>"; };
 		ED26F0FA2C3B854B00766F89 /* MovieLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieLoader.swift; sourceTree = "<group>"; };
 		ED26F0FE2C3B88EC00766F89 /* RemoteMovieLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMovieLoaderTests.swift; sourceTree = "<group>"; };
+		ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMovieLoader.swift; sourceTree = "<group>"; };
 		ED7269E22C38648A00A7705F /* List Examination.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "List Examination.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED7269E52C38648A00A7705F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		ED7269E72C38648A00A7705F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -215,6 +217,14 @@
 			path = Interfaces;
 			sourceTree = "<group>";
 		};
+		ED26F1002C3B96E000766F89 /* API Handling */ = {
+			isa = PBXGroup;
+			children = (
+				ED26F1012C3B96F900766F89 /* RemoteMovieLoader.swift */,
+			);
+			path = "API Handling";
+			sourceTree = "<group>";
+		};
 		ED7269D92C38648A00A7705F = {
 			isa = PBXGroup;
 			children = (
@@ -236,6 +246,7 @@
 		ED7269E42C38648A00A7705F /* List Examination */ = {
 			isa = PBXGroup;
 			children = (
+				ED26F1002C3B96E000766F89 /* API Handling */,
 				ED26F0F92C3B852B00766F89 /* Interfaces */,
 				ED26F0F12C3AFA8A00766F89 /* Helper */,
 				ED26F0E82C3AA9D700766F89 /* Models */,
@@ -379,6 +390,7 @@
 			files = (
 				EDAB8AB82C39C09800B42E7B /* UICollectionViewCell+Extensions.swift in Sources */,
 				ED26F0F32C3AFA9500766F89 /* ImageCache.swift in Sources */,
+				ED26F1022C3B96F900766F89 /* RemoteMovieLoader.swift in Sources */,
 				ED26F0EC2C3AAA3500766F89 /* APIResult.swift in Sources */,
 				ED26F0FB2C3B854B00766F89 /* MovieLoader.swift in Sources */,
 				ED7269E62C38648A00A7705F /* AppDelegate.swift in Sources */,
