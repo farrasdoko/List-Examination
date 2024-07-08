@@ -8,7 +8,7 @@
 import Foundation
 
 protocol HTTPClient {
-    func get(from url: URL)
+    func get(from url: URL) async -> LoadMovieResult
 }
 
 final class RemoteMovieLoader {
@@ -20,7 +20,7 @@ final class RemoteMovieLoader {
         self.client = client
     }
     
-    func load() {
-        client.get(from: url)
+    func load() async -> LoadMovieResult {
+        return await client.get(from: url)
     }
 }
